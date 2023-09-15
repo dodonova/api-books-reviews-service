@@ -1,7 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
-
-User = get_user_model() # можно для начала так оставить
+from users.models import User
 
 
 class Category(models.Model):
