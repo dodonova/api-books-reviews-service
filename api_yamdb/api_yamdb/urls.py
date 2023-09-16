@@ -8,19 +8,6 @@ from rest_framework.routers import SimpleRouter
 from api.views import ReviewViewSet, CommentViewSet
 
 
-router = SimpleRouter()
-router.register(
-    r'titles/(?P<title_id>[^/.]+)/reviews/(?P<review_id>[^/.]+)/comments',
-    CommentViewSet,
-    basename='comment'
-)
-router.register(
-    r'titles/(?P<title_id>[^/.]+)/reviews',
-    ReviewViewSet,
-    basename='review'
-)
-
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path(
