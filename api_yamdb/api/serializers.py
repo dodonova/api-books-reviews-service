@@ -1,8 +1,12 @@
 from django.core.files.base import ContentFile
-from rest_framework import serializers, permissions
+from rest_framework import serializers
 from rest_framework.relations import SlugRelatedField
 
-from reviews.models import Category, Genre, Title
+from reviews.models import (Category,
+                            Genre,
+                            Title,
+                            Review,
+                            Comment)
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -43,9 +47,6 @@ class TitleSerializer(serializers.ModelSerializer):
             genre = Genre.objects.get(slug=genre_data.slug)
             title.genre.add(genre)
         return title
-from rest_framework import serializers
-
-from reviews.models import Review, Comment
 
 
 class CommentSerializer(serializers.ModelSerializer):

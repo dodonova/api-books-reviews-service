@@ -1,9 +1,7 @@
-from django.shortcuts import render
-from rest_framework import viewsets, filters, permissions
-
 from .permissions import IsAdminUserOrReadonly
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
-from reviews.models import Category, Genre, Title
+from reviews.models import Category, Genre, Title, Review, Comment
+
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -28,8 +26,6 @@ from api.serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
-
-from reviews.models import Review, Comment, Title
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
