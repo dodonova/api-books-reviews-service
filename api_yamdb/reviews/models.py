@@ -20,7 +20,8 @@ class Review(models.Model):
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField()
-    pub_date = models.DateTimeField()
+    pub_date = models.DateTimeField(
+        'Дата добавления ревью', auto_now_add=True, db_index=True)
 
 
 class Genre(models.Model):
@@ -32,7 +33,8 @@ class Comment(models.Model):
     review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    pub_date = models.DateTimeField()
+    pub_date = models.DateTimeField(
+        'Дата добавления комментария', auto_now_add=True, db_index=True)
 
 
 class Genre_Title(models.Model):

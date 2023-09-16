@@ -1,4 +1,5 @@
 from rest_framework import viewsets
+from rest_framework.pagination import PageNumberPagination
 
 from api.serializers import (
     ReviewSerializer,
@@ -10,6 +11,7 @@ from reviews.models import Review, Comment, Title
 
 class ReviewViewSet(viewsets.ModelViewSet):
     serializer_class = ReviewSerializer
+    pagination_class = PageNumberPagination
     # permission_classes = (AuthorOrReadOnly,)
 
     def perform_create(self, serializer):
@@ -25,6 +27,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
+    pagination_class = PageNumberPagination
     # permission_classes = (AuthorOrReadOnly,)
 
     def perform_create(self, serializer):
