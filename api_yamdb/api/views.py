@@ -38,9 +38,6 @@ class CommentViewSet(viewsets.ModelViewSet):
         )
 
     def get_queryset(self):
-        title_id = self.kwargs.get("title_id")
         review_id = self.kwargs.get("review_id")
-        new_queryset = Comment.objects.filter(
-            id=title_id, review_id=review_id
-        )
+        new_queryset = Comment.objects.filter(review_id=review_id)
         return new_queryset
