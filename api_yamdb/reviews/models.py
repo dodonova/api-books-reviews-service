@@ -37,8 +37,3 @@ class Comment(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     pub_date = models.DateTimeField(
         'Дата добавления комментария', auto_now_add=True, db_index=True)
-
-
-class Genre_Title(models.Model):
-    title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
-    genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
