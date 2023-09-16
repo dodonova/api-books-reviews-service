@@ -21,16 +21,24 @@ class Title(models.Model):
     genre = models.ManyToManyField(Genre)
 
 
+
 class Review(models.Model):
     title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     score = models.IntegerField()
-    pub_date = models.DateTimeField()
+    pub_date = models.DateTimeField(
+        'Дата добавления ревью', auto_now_add=True, db_index=True)
 
 
 class Comment(models.Model):
     review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    pub_date = models.DateTimeField()
+    pub_date = models.DateTimeField(
+        'Дата добавления комментария', auto_now_add=True, db_index=True)
+
+
+class Genre_Title(models.Model):
+    title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
+    genre_id = models.ForeignKey(Genre, on_delete=models.CASCADE)
