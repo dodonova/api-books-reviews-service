@@ -1,3 +1,6 @@
+from django.shortcuts import render
+from rest_framework import viewsets, filters, permissions
+
 from .permissions import IsAdminUserOrReadonly
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 from reviews.models import Category, Genre, Title, Review, Comment
