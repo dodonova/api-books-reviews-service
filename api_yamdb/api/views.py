@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import viewsets, filters, permissions
 
 from .permissions import IsAdminUserOrReadonly
@@ -10,7 +10,8 @@ from reviews.models import Category, Genre, Title, Review, Comment
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminUserOrReadonly, )
+    permission_classes = (IsAdminUserOrReadonly, ) 
+    lookup_field = 'slug'
 
 
 class GenreViewSet(viewsets.ModelViewSet):
