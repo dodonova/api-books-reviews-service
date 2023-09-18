@@ -3,6 +3,7 @@ from rest_framework.permissions import SAFE_METHODS, BasePermission
 
 class IsAdmin(BasePermission):
     def has_permission(self, request, view):
+
         if not request.user.is_anonymous:
             return (
                 request.user.is_superuser

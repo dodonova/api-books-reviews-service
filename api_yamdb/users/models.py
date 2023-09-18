@@ -1,6 +1,6 @@
-from django.db import models
-from .validators import validate_pattern_symbols, max_length
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import RegexValidator
+from django.db import models
 
 
 class User(AbstractUser):
@@ -15,11 +15,11 @@ class User(AbstractUser):
     username = models.CharField(max_length=150,
                                 unique=True,
                                 blank=False,
-                                validators=[validate_pattern_symbols])
+                                validators=([RegexValidator
+                                             (regex=r'^[\w.@+-]+$')]))
     email = models.EmailField(max_length=254,
                               blank=False,
-                              unique=True,
-                              validators=[max_length])
+                              unique=True)
     bio = models.TextField(max_length=150, blank=True)
     confirmation_code = models.CharField(
         'Код подтверждения',

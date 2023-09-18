@@ -1,37 +1,46 @@
 from rest_framework import serializers
 
 from .models import User
-from .validators import validate_pattern_symbols, max_length, max_length254
-from rest_framework.validators import UniqueValidator
 
-class RegistrationSerializer(serializers.ModelSerializer):
-    """ Сериализация регистрации пользователя и создания нового. """
 
-    def validate_username(self, value):
-        if value.lower() == 'me':
-            raise serializers.ValidationError(
-                'Выберите другое имя пользователя'
-            )
-        return value
+class UserCreateSerializer(serializers.ModelSerializer):
+    username = serializers.RegexField(
+        regex=r'^[\w.@+-]+$',
+        max_length=150,
+        required=True
+    )
+
+    email = serializers.EmailField(
+        max_length=254,
+        required=True,
+    )
 
     class Meta:
         model = User
-        fields = ['email', 'username']
+        fields = ('username',
+                  'email',
+                  'first_name',
+                  'last_name',
+                  'bio',
+                  'role')
+
+    def validate_username(self, value):
+        if value == 'me':
+            raise serializers.ValidationError(
+                'Имя пользователя "me" запрещено.'
+            )
+        return value
 
 
 class TokenSerializer(serializers.Serializer):
     username = serializers.CharField(required=True)
     confirmation_code = serializers.CharField(required=True)
 
-class UserSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(
-        validators=[UniqueValidator(queryset=User.objects.all()), validate_pattern_symbols, max_length],
-        required=True,
-    )
-    email = serializers.EmailField(
-        validators=[UniqueValidator(queryset=User.objects.all()), max_length254]
-    )
+
+class UsersSerializer(serializers.ModelSerializer):
+
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name',
-                  'last_name', 'bio', 'role']
+        fields = (
+            'username', 'email', 'first_name', 'last_name', 'bio', 'role',
+        )
