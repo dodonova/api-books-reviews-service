@@ -1,6 +1,6 @@
-from django.core.files.base import ContentFile
+# from django.core.files.base import ContentFile
 from rest_framework import serializers
-from rest_framework.relations import SlugRelatedField
+# from rest_framework.relations import SlugRelatedField
 
 from reviews.models import (Category,
                             Genre,
@@ -36,8 +36,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'category', 'genre')
-
+        fields = ('__all__')
 
     def create(self, validated_data):
         genre_data = validated_data.pop('genre')
@@ -57,7 +56,7 @@ class CommentSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'pub_date',)
+        fields = ('__all__')
         model = Comment
         # read_only_fields = ('author', 'review_id',)
 
@@ -70,6 +69,6 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
 
     class Meta:
-        fields = ('id', 'text', 'author', 'score', 'pub_date',)
+        fields = ('__all__')
         model = Review
         # read_only_fields = ('author', 'title_id',)

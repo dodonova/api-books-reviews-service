@@ -1,11 +1,5 @@
-from django.contrib.auth import get_user_model
 from django.db import models
-<<<<<<< HEAD
-
-User = get_user_model()  # можно для начала так оставить
-=======
 from users.models import User
->>>>>>> feature/Anton
 
 
 class Category(models.Model):
@@ -23,7 +17,6 @@ class Title(models.Model):
     year = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     genre = models.ManyToManyField(Genre)
-
 
 
 class Review(models.Model):
