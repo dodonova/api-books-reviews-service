@@ -1,4 +1,8 @@
 from django.contrib import admin
+<<<<<<< HEAD
+=======
+from django.urls import path, include
+>>>>>>> feature/Anton
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.conf.urls.static import static
@@ -15,7 +19,11 @@ urlpatterns = [
         TemplateView.as_view(template_name='redoc.html'),
         name='redoc'
     ),
+<<<<<<< HEAD
     path('api/v1/', include('api.urls')),
+=======
+    path('api/v1/', include('users.urls'))
+>>>>>>> feature/Anton
 ]
 
 if settings.DEBUG:
