@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from django.shortcuts import render
 from rest_framework import viewsets, filters, permissions
 
@@ -63,3 +64,5 @@ class CommentViewSet(viewsets.ModelViewSet):
         review_id = self.kwargs.get("review_id")
         new_queryset = Comment.objects.filter(review_id=review_id)
         return new_queryset
+=======
+>>>>>>> feature/Anton
