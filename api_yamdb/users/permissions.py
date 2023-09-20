@@ -20,3 +20,9 @@ class IsAdminOrReadOnly(BasePermission):
                 and request.user.is_superuser
                 or request.user.role == 'admin')
         )
+
+class IsAdminExceptGet(BasePermission):
+    def has_permission(self, request, view):
+        if request.method != 'GET':
+            return request.user.is_superuser
+        return False

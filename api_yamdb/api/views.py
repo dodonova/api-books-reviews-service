@@ -1,10 +1,13 @@
 from django.shortcuts import render
-from rest_framework import viewsets, filters, permissions
+
+from rest_framework import viewsets, filters, permissions, status
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.response import Response
 
 
-from users.permissions import IsAdminOrReadOnly
+
+from users.permissions import IsAdminOrReadOnly, IsAdmin, IsAdminExceptGet
 
 from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
 from reviews.models import Category, Genre, Title, Review, Comment
@@ -18,8 +21,31 @@ from api.serializers import (
 class CategoryViewSet(viewsets.ModelViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = (IsAdminOrReadOnly, )
+    permission_classes = (IsAdminOrReadOnly, IsAdmin)
     pagination_class = LimitOffsetPagination
+    lookup_field = 'slug'
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('=slug', 'name')
+
+    def get_permissions(self):
+        if self.action == 'list': 
+            if self.request.method == 'GET':
+                self.permission_classes = [permissions.AllowAny]
+            else:
+                self.permission_classes = [IsAdmin, ]
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            self.permission_classes = [IsAdmin]
+        else:
+            self.permission_classes = [IsAdminExceptGet]
+        return super(CategoryViewSet, self).get_permissions()
+    
+    # def create(self, request, *args, **kwargs):
+    #     serializer = self.get_serializer(data=request.data)
+    #     if not serializer.is_valid():
+    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    #     self.perform_create(serializer)
+    #     headers = self.get_success_headers(serializer.data)
+    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 
 class GenreViewSet(viewsets.ModelViewSet):
