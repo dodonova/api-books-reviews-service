@@ -1,3 +1,5 @@
+import re
+
 from django.shortcuts import render
 
 from rest_framework import viewsets, filters, permissions, status
@@ -39,6 +41,30 @@ class CategoryViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAdminExceptGet]
         return super(CategoryViewSet, self).get_permissions()
     
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        if set(data.keys()) != {'slug', 'name'}:
+            return Response(
+                {'error': 'JSON should contain "slug" and "name" keys'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if len(data['name']) > 256:
+            return Response(
+                {'error': 'Name should not exceed 256 characters'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if len(data['slug']) > 50:
+            return Response(
+                {'error': 'Slug should not exceed 50 characters'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if not re.match(r'^[-a-zA-Z0-9_]+$', data['slug']):
+            return Response(
+                {'error': 'Slug should match the pattern ^[-a-zA-Z0-9_]+$'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        return super(CategoryViewSet, self).create(request, *args, **kwargs)
+    
     # def create(self, request, *args, **kwargs):
     #     serializer = self.get_serializer(data=request.data)
     #     if not serializer.is_valid():
@@ -46,7 +72,6 @@ class CategoryViewSet(viewsets.ModelViewSet):
     #     self.perform_create(serializer)
     #     headers = self.get_success_headers(serializer.data)
     #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
 
 class GenreViewSet(viewsets.ModelViewSet):
     queryset = Genre.objects.all()
