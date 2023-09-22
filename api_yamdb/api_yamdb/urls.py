@@ -14,7 +14,7 @@ urlpatterns = [
         name='redoc'
     ),
     path('api/v1/', include('api.urls')),
-    path('api/v1/', include('users.urls'))
+    path('api/v1/', include('users.urls')),
 ]
 
 if settings.DEBUG:
