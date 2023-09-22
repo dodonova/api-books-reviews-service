@@ -1,5 +1,7 @@
 from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+
 
 from users.models import User
 
@@ -8,7 +10,7 @@ from users.models import User
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=200)
     slug = models.SlugField(unique=True, max_length=50)
 
 
@@ -22,6 +24,13 @@ class Title(models.Model):
     year = models.IntegerField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     genre = models.ManyToManyField(Genre)
+    description = models.TextField(blank=True, null=True)
+    rating = models.FloatField(
+        blank=True,
+        null=True,
+        default=5.0,
+        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
+    )
 
 
 

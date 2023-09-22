@@ -20,7 +20,7 @@ class GenreSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Genre
-        fields = ('id', 'slug', 'name')
+        fields = ('slug', 'name')
 
 
 class TitleSerializer(serializers.ModelSerializer):
@@ -33,21 +33,47 @@ class TitleSerializer(serializers.ModelSerializer):
         many=True,
         slug_field='slug',
     )
+    # category = CategorySerializer()
+    # genre = GenreSerializer(many=True)
+
 
     class Meta:
         model = Title
-        fields = ('name', 'year', 'category', 'genre')
-
+        fields = ('id', 'name', 'year', 'category', 'genre', 'description', 'rating')
+    
+    def to_representation(self, instance):
+         # Если запрос GET, то сериализуем связанные объекты через соответствующие сериализаторы
+        if self.context['request'].method == 'GET':
+            # category = CategorySerializer()
+            # genre = GenreSerializer(many=True)
+            
+            genre_serializer = GenreSerializer(instance.genre.all(), many=True)
+            category_serializer = CategorySerializer(instance.category)
+            return {
+                'id': instance.id,
+                'name': instance.name,
+                'year': instance.year,
+                'rating': instance.rating,
+                'description': instance.description,
+                'genre': genre_serializer.data,
+                'category': category_serializer.data
+            }
+        else:
+            return super().to_representation(instance)
 
     def create(self, validated_data):
         genre_data = validated_data.pop('genre')
         category = validated_data.pop('category')
+        # category = Category.objects.get(slug=category_slug)
         title = Title.objects.create(category=category, **validated_data)
         for genre_data in genre_data:
             genre = Genre.objects.get(slug=genre_data.slug)
             title.genre.add(genre)
         return title
+        
+    
 
+    
 
 class CommentSerializer(serializers.ModelSerializer):
     author = serializers.SlugRelatedField(

@@ -10,7 +10,7 @@ from .views import (CategoryViewSet,
 
 router = routers.DefaultRouter()
 router.register(r'categories', CategoryViewSet),
-router.register(r'genre', GenreViewSet)
+router.register(r'genres', GenreViewSet)
 router.register(r'titles', TitleViewSet)
 router.register(
     r'titles/(?P<title_id>[^/.]+)/reviews/(?P<review_id>[^/.]+)/comments',

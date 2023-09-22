@@ -1,6 +1,8 @@
 import re
 
 from django.shortcuts import render
+from django.views.decorators.http import require_http_methods
+
 
 from rest_framework import viewsets, filters, permissions, status
 from rest_framework.pagination import PageNumberPagination
@@ -20,9 +22,8 @@ from api.serializers import (
     CommentSerializer,
 )
 
-class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
-    serializer_class = CategorySerializer
+
+class BaseViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, IsAdmin)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
@@ -37,9 +38,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 self.permission_classes = [IsAdmin, ]
         elif self.action in ['update', 'partial_update', 'destroy']:
             self.permission_classes = [IsAdmin]
-        else:
-            self.permission_classes = [IsAdminExceptGet]
-        return super(CategoryViewSet, self).get_permissions()
+        return super(BaseViewSet, self).get_permissions()
     
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -48,7 +47,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 {'error': 'JSON should contain "slug" and "name" keys'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        if len(data['name']) > 256:
+        if len(data['name']) > 200:
             return Response(
                 {'error': 'Name should not exceed 256 characters'},
                 status=status.HTTP_400_BAD_REQUEST
@@ -63,25 +62,141 @@ class CategoryViewSet(viewsets.ModelViewSet):
                 {'error': 'Slug should match the pattern ^[-a-zA-Z0-9_]+$'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        return super(CategoryViewSet, self).create(request, *args, **kwargs)
+        return super(BaseViewSet, self).create(request, *args, **kwargs)
     
-    # def create(self, request, *args, **kwargs):
-    #     serializer = self.get_serializer(data=request.data)
-    #     if not serializer.is_valid():
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    #     self.perform_create(serializer)
-    #     headers = self.get_success_headers(serializer.data)
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def partial_update(self, request, *args, **kwargs):
+        return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    def update(self, request, *args, **kwargs):
+        return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
 
-class GenreViewSet(viewsets.ModelViewSet):
+    def retrieve(self, request, *args, **kwargs):
+        return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+class CategoryViewSet(BaseViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+
+class GenreViewSet(BaseViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = (IsAdminOrReadOnly, )
+
+
+# class CategoryViewSet(viewsets.ModelViewSet):
+#     queryset = Category.objects.all()
+#     serializer_class = CategorySerializer
+#     permission_classes = (IsAdminOrReadOnly, IsAdmin)
+#     pagination_class = LimitOffsetPagination
+#     lookup_field = 'slug'
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('=slug', 'name')
+
+#     def get_permissions(self):
+#         if self.action == 'list': 
+#             if self.request.method == 'GET':
+#                 self.permission_classes = [permissions.AllowAny]
+#             else:
+#                 self.permission_classes = [IsAdmin, ]
+#         elif self.action in ['update', 'partial_update', 'destroy']:
+#             self.permission_classes = [IsAdmin]
+#         return super(CategoryViewSet, self).get_permissions()
+    
+#     def create(self, request, *args, **kwargs):
+#         data = request.data
+#         if set(data.keys()) != {'slug', 'name'}:
+#             return Response(
+#                 {'error': 'JSON should contain "slug" and "name" keys'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if len(data['name']) > 200:
+#             return Response(
+#                 {'error': 'Name should not exceed 256 characters'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if len(data['slug']) > 50:
+#             return Response(
+#                 {'error': 'Slug should not exceed 50 characters'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if not re.match(r'^[-a-zA-Z0-9_]+$', data['slug']):
+#             return Response(
+#                 {'error': 'Slug should match the pattern ^[-a-zA-Z0-9_]+$'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         return super(CategoryViewSet, self).create(request, *args, **kwargs)
+    
+#     def partial_update(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+#     def update(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+#     def retrieve(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+# # TODO: объединить классы Genre и Category одним предком
+
+ 
+# class GenreViewSet(viewsets.ModelViewSet):
+#     queryset = Genre.objects.all()
+#     serializer_class = GenreSerializer
+#     # permission_classes = (IsAdminOrReadOnly, )
+#     permission_classes = (IsAdminOrReadOnly, IsAdmin)
+#     pagination_class = LimitOffsetPagination
+#     lookup_field = 'slug'
+#     filter_backends = (filters.SearchFilter,)
+#     search_fields = ('=slug', 'name')
+
+#     def get_permissions(self):
+#         if self.action == 'list': 
+#             if self.request.method == 'GET':
+#                 self.permission_classes = [permissions.AllowAny]
+#             else:
+#                 self.permission_classes = [IsAdmin, ]
+#         elif self.action in ['update', 'partial_update', 'destroy']:
+#             self.permission_classes = [IsAdmin]
+#         return super(GenreViewSet, self).get_permissions()
+    
+#     def create(self, request, *args, **kwargs):
+#         data = request.data
+#         if set(data.keys()) != {'slug', 'name'}:
+#             return Response(
+#                 {'error': 'JSON should contain "slug" and "name" keys'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if len(data['name']) > 200:
+#             return Response(
+#                 {'error': 'Name should not exceed 256 characters'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if len(data['slug']) > 50:
+#             return Response(
+#                 {'error': 'Slug should not exceed 50 characters'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         if not re.match(r'^[-a-zA-Z0-9_]+$', data['slug']):
+#             return Response(
+#                 {'error': 'Slug should match the pattern ^[-a-zA-Z0-9_]+$'},
+#                 status=status.HTTP_400_BAD_REQUEST
+#             )
+#         return super(GenreViewSet, self).create(request, *args, **kwargs)
+
+#     def partial_update(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+#     def update(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+#     def retrieve(self, request, *args, **kwargs):
+#         return Response({'error': f'Method {self.request.method} Not Allowed'}, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
+    permission_classes = (IsAdminOrReadOnly, )
+
 
 
 

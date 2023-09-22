@@ -38,7 +38,7 @@ class Command(BaseCommand):
                             required=False,
                             default=None,
                             help='CSV file name with data for import.')
-    
+     
     def import_table(self, db, table, csv_file):
         try:   
             if not os.path.isfile(csv_file):
@@ -73,7 +73,7 @@ class Command(BaseCommand):
                 'review': 'reviews_review',
                 'title_genre': 'reviews_title_genre',
                 'comment': 'reviews_comment',
-                'user': 'auth_user'
+                'user': 'users_user'
             }
             for filename, table_name in model_names.items():
                 self.import_table(db_name, table_name, f'static/data/{filename}.csv')
