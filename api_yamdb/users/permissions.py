@@ -29,3 +29,12 @@ class IsAdminExceptGet(BasePermission):
                 or request.user.role == 'admin'
             )
         return False
+
+class IsAdminExceptGet(BasePermission):
+    def has_permission(self, request, view):
+        if request.method != 'GET':
+            return  (
+                request.user.is_superuser
+                or request.user.role == 'admin'
+            )
+        return False
