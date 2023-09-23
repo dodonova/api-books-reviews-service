@@ -26,7 +26,8 @@ from reviews.models import (
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
-    TitleSerializer
+    TitleSerializer,
+    TitleGETSerializer
 )
 from api.serializers import (
     ReviewSerializer,
