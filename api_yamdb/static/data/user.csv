@@ -1,11 +1,6 @@
-<<<<<<< HEAD
 id,username,email,role,bio,first_name,last_name
 100,bingobongo,bingobongo@yamdb.fake,user,,,
 101,capt_obvious,capt_obvious@yamdb.fake,admin,,,
 102,faust,faust@yamdb.fake,user,,,
 103,reviewer,reviewer@yamdb.fake,user,,,
 104,angry,angry@yamdb.fake,moderator,,,
-=======
-id,password,last_login,is_superuser,first_name,last_name,is_staff,is_active,date_joined,username,email,bio,confirmation_code,role
-1,pbkdf2_sha256$260000$OPMtVtgBdmxHw7IqQHI7ug$Jp6EsNTY2k0bzEanQvfnrrr0ubQZeSi26uOTELEuo9I=,,1,,,1,1,2023-09-22 17:01:11.192102,root,uniq@mail.com,,buxtyx-ab7d2e5cfcad2e04d09e37f56afac3c9,user
->>>>>>> feature/category2
