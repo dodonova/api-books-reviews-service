@@ -1,12 +1,6 @@
-from django.contrib.auth import get_user_model
-from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 
-
 from users.models import User
-
-# User = get_user_model() # можно для начала так оставить
-
 
 
 class Category(models.Model):
@@ -25,13 +19,6 @@ class Title(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     genre = models.ManyToManyField(Genre)
     description = models.TextField(blank=True, null=True)
-    rating = models.FloatField(
-        blank=True,
-        null=True,
-        default=5.0,
-        validators=[MinValueValidator(0.0), MaxValueValidator(10.0)]
-    )
-
 
 
 class Review(models.Model):

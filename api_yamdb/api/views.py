@@ -1,33 +1,35 @@
-import re
-
-from django.shortcuts import render
-from django.views.decorators.http import require_http_methods
-
-
-from rest_framework import viewsets, filters, permissions, status, mixins
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.pagination import LimitOffsetPagination
-from rest_framework.response import Response
+from rest_framework import (
+    viewsets, filters, permissions, mixins
+)
 
-
-
-from users.permissions import IsAdminOrReadOnly, IsAdmin, IsAdminExceptGet
-
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer
-from reviews.models import Category, Genre, Title, Review, Comment
-# from users.permissions import IsAdminOrReadOnly
+from users.permissions import IsAdminOrReadOnly, IsAdmin
+from reviews.models import (
+    Category,
+    Genre,
+    Title,
+    Review,
+    Comment
+)
+from .serializers import (
+    CategorySerializer,
+    GenreSerializer,
+    TitleSerializer
+)
 from .permissions import CorrectSlugName
-
 from api.serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
 
 
-class BaseViewSet(mixins.CreateModelMixin,
-                  mixins.ListModelMixin,
-                  mixins.DestroyModelMixin,
-                  viewsets.GenericViewSet):
+class BaseViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet
+):
     permission_classes = (IsAdminOrReadOnly, IsAdmin)
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
