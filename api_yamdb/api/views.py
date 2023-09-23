@@ -12,16 +12,14 @@ from api.permissions import (
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework import (
-    viewsets, filters, permissions, mixins
+    viewsets, filters, mixins
 )
 
-from users.permissions import IsAdminOrReadOnly, IsAdmin
 from reviews.models import (
     Category,
     Genre,
     Title,
     Review,
-    Comment
 )
 from .serializers import (
     CategorySerializer,
@@ -34,6 +32,7 @@ from api.serializers import (
     CommentSerializer,
 )
 from .permissions import IsAdminOrGetList
+
 
 class BaseSlugNameViewSet(
     mixins.CreateModelMixin,
@@ -51,6 +50,7 @@ class BaseSlugNameViewSet(
 class CategoryViewSet(BaseSlugNameViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
+
 
 class GenreViewSet(BaseSlugNameViewSet):
     queryset = Genre.objects.all()

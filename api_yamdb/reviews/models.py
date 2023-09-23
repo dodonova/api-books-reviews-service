@@ -33,6 +33,7 @@ class Category(SlugNameModel):
 class Genre(SlugNameModel):
     pass
 
+
 class Title(models.Model):
     name = models.CharField(max_length=256)
     year = models.PositiveSmallIntegerField()
