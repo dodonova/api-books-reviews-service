@@ -17,41 +17,30 @@ from .serializers import (
     GenreSerializer,
     TitleSerializer
 )
-from .permissions import CorrectSlugName
 from api.serializers import (
     ReviewSerializer,
     CommentSerializer,
 )
+from .permissions import IsAdminOrGetList
 
-
-class BaseViewSet(
+class BaseSlugNameViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    permission_classes = (IsAdminOrReadOnly, IsAdmin)
+    permission_classes = (IsAdminOrGetList, )
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)
     search_fields = ('=slug', 'name')
 
-    def get_permissions(self):
-        if self.action == 'list': 
-            if self.request.method == 'GET':
-                self.permission_classes = [permissions.AllowAny]
-            elif self.request.method == 'POST':
-                self.permission_classes = [IsAdmin, CorrectSlugName]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            self.permission_classes = [IsAdmin]
-        return super(BaseViewSet, self).get_permissions()
-    
 
-class CategoryViewSet(BaseViewSet):
+class CategoryViewSet(BaseSlugNameViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
-class GenreViewSet(BaseViewSet):
+class GenreViewSet(BaseSlugNameViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 

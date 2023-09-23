@@ -1,31 +1,35 @@
-import re
-from rest_framework import status
-from rest_framework.response import Response
+from rest_framework import permissions
+from users.permissions import IsAdminOrReadOnly
 
-from users.permissions import IsAdmin
+class IsAdmin(permissions.BasePermission):
+
+    def has_permission(self, request, view):
+        return request.user.is_authenticated and (request.user.role == 'admin')
 
 
-class CorrectSlugName(IsAdmin):
+class IsAdminOrSafeMethods(IsAdmin):
+
+    def has_permission(self, request, view):
+        return (
+            request.method in permissions.SAFE_METHODS
+            or super().has_permission(request, view)
+        )
+
+
+class IsAuthorModerAdminOrSafeMethods(permissions.IsAuthenticatedOrReadOnly):
+
     def has_object_permission(self, request, view, obj):
-        data = request.data
-        if set(data.keys()) != {'slug', 'name'}:
-            return Response(
-                {'error': 'JSON should contain "slug" and "name" keys'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if len(data['name']) > 200:
-            return Response(
-                {'error': 'Name should not exceed 256 characters'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if len(data['slug']) > 50:
-            return Response(
-                {'error': 'Slug should not exceed 50 characters'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        if not re.match(r'^[-a-zA-Z0-9_]+$', data['slug']):
-            return Response(
-                {'error': 'Slug should match the pattern ^[-a-zA-Z0-9_]+$'},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return True
+        return (
+            request.method in permissions.SAFE_METHODS
+            or obj.author == request.user
+            or (request.user.role == 'moderator')
+            or (request.user.role == 'admin')
+        )
+
+
+class IsAdminOrGetList(IsAdminOrReadOnly):
+    def has_object_permission(self, request, view, obj):
+        return (
+            view.action == 'list'
+            or request.method == 'DELETE'
+        )
