@@ -1,19 +1,37 @@
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxLengthValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 
 from users.models import User
 
 
-class Category(models.Model):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=50, unique=True)
+class SlugNameModel(models.Model):
+    name = models.CharField(
+        max_length=200,
+        validators=[
+            MaxLengthValidator(limit_value=200)
+        ]
+    )
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        validators=[
+            MaxLengthValidator(50),
+            RegexValidator(regex=r'^[-a-zA-Z0-9_]+$')
+        ]
+    )
+
+    class Meta:
+        abstract = True
 
 
-class Genre(models.Model):
-    name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=50, unique=True)
+class Category(SlugNameModel):
+    pass
 
+
+class Genre(SlugNameModel):
+    pass
 
 class Title(models.Model):
     name = models.CharField(max_length=256)

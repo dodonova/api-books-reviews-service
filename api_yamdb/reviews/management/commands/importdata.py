@@ -3,7 +3,6 @@ import csv, sqlite3
 # from os import subprocess
 import subprocess
 import os
-import pandas
 from pathlib import Path
 
 from django.core.management.base import BaseCommand
@@ -40,6 +39,7 @@ class Command(BaseCommand):
                             default=None,
                             help='CSV file name with data for import.')
     
+     
     def import_table(self, db, table, csv_file):
         try:   
             if not os.path.isfile(csv_file):

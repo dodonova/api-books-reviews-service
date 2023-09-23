@@ -1,4 +1,5 @@
-id,name,slug
-1,Фильм,movie
-2,Книга,book
-3,Музыка,music
+id,slug,name
+1,movie,Фильм
+2,book,Книга
+3,music,Музыка
+4,tv,Телепередача

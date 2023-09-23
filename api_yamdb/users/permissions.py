@@ -11,7 +11,6 @@ class IsAdmin(BasePermission):
             )
         return False
 
-
 class IsAdminOrReadOnly(BasePermission):
     def has_permission(self, request, view):
         return (
