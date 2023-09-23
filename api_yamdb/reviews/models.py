@@ -1,43 +1,115 @@
-from django.contrib.auth import get_user_model
+from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-<<<<<<< HEAD
+from django.utils import timezone
 
-User = get_user_model()  # можно для начала так оставить
-=======
 from users.models import User
->>>>>>> feature/Anton
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=50, unique=True)
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=50, unique=True)
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=200)
-    year = models.IntegerField()
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
-    genre = models.ManyToManyField(Genre)
+    name = models.CharField(max_length=256)
+    year = models.PositiveSmallIntegerField()
+    description = models.TextField(blank=True)
+    category = models.ForeignKey(
+        Category,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='category'
+    )
+    genre = models.ManyToManyField(
+        Genre,
+        through='GenreTitle',
+    )
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(year__lte=timezone.now().year,),
+                name='year_lte_this_year'
+            ),
+            models.CheckConstraint(
+                check=models.Q(year__gte=0,),
+                name='year_gte_min_year'
+            ),
+        ]
+        ordering = ('-id',)
+
+    def __str__(self):
+        return self.name
+
+
+class GenreTitle(models.Model):
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+    )
+    genre = models.ForeignKey(
+        Genre,
+        on_delete=models.CASCADE,
+    )
+
+    def __str__(self):
+        return f'{self.title}-{self.genre}'
 
 
 class Review(models.Model):
-    title_id = models.ForeignKey(Title, on_delete=models.CASCADE)
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
     text = models.TextField()
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
-    score = models.IntegerField()
+    score = models.PositiveSmallIntegerField(
+        validators=[
+            MinValueValidator(1, '< 1'),
+            MaxValueValidator(10, '> 10')
+        ]
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+    )
     pub_date = models.DateTimeField(
-        'Дата добавления ревью', auto_now_add=True, db_index=True)
+        auto_now_add=True,
+        db_index=True
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['title', 'author'],
+                name='title_author'
+            )
+        ]
+        ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text
 
 
 class Comment(models.Model):
-    review_id = models.ForeignKey(Review, on_delete=models.CASCADE)
+    review = models.ForeignKey(
+        Review,
+        on_delete=models.CASCADE,
+        related_name='comments',
+    )
     text = models.TextField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
-    pub_date = models.DateTimeField(
-        'Дата добавления комментария', auto_now_add=True, db_index=True)
+    pub_date = models.DateTimeField(auto_now_add=True, db_index=True)
+
+    class Meta:
+        ordering = ('pub_date',)
+
+    def __str__(self):
+        return self.text
