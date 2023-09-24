@@ -29,6 +29,7 @@ class IsAuthorModerAdminOrSafeMethods(permissions.IsAuthenticatedOrReadOnly):
 
 
 class IsAdminOrGetList(IsAdminOrReadOnly):
+    
     def has_object_permission(self, request, view, obj):
         return (
             view.action == 'list'

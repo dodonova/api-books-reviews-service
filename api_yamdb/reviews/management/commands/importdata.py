@@ -1,9 +1,10 @@
-import subprocess
-import os
 import csv
-import sqlite3
-import errno
 import datetime
+import errno
+import os
+import subprocess
+import sqlite3
+
 from django.core.management.base import BaseCommand
 
 

@@ -12,9 +12,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
-from .models import User
-from .permissions import IsAdmin
-from .serializers import TokenSerializer, UserCreateSerializer, UsersSerializer
+from users.models import User
+from users.permissions import IsAdmin
+from users.serializers import TokenSerializer, UserCreateSerializer, UsersSerializer
 
 
 class SignUpView(APIView):

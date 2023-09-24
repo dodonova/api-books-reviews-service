@@ -39,7 +39,7 @@ class User(AbstractUser):
     REQUIRED_FIELDS = ['username']
 
     class Meta:
-        verbose_name = 'Пользователь'
+        verbose_name = 'пользователь'
         verbose_name_plural = 'Пользователи'
         ordering = ['username']
 

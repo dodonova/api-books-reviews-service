@@ -1,58 +1,39 @@
 from django.shortcuts import get_object_or_404
 from django.db.models import Avg
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
 from rest_framework.pagination import PageNumberPagination
+from rest_framework import viewsets
 
 from api.filters import TitleGenreFilter
 from api.permissions import (
     IsAdminOrSafeMethods,
     IsAuthorModerAdminOrSafeMethods
 )
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.pagination import LimitOffsetPagination
-from rest_framework import (
-    viewsets, filters, mixins
+from api.serializers import (
+    CommentSerializer,
+    ReviewSerializer,
 )
-
 from reviews.models import (
     Category,
     Genre,
     Title,
     Review,
 )
-from .serializers import (
+from api.serializers import (
     CategorySerializer,
     GenreSerializer,
+    TitleGETSerializer,
     TitleSerializer,
-    TitleGETSerializer
 )
-from api.serializers import (
-    ReviewSerializer,
-    CommentSerializer,
-)
-from .permissions import IsAdminOrGetList
+from api.mixins import SlugNameViewSet
 
 
-class BaseSlugNameViewSet(
-    mixins.CreateModelMixin,
-    mixins.ListModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet
-):
-    permission_classes = (IsAdminOrGetList, )
-    pagination_class = LimitOffsetPagination
-    lookup_field = 'slug'
-    filter_backends = (filters.SearchFilter,)
-    search_fields = ('=slug', 'name')
-
-
-class CategoryViewSet(BaseSlugNameViewSet):
+class CategoryViewSet(SlugNameViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
-class GenreViewSet(BaseSlugNameViewSet):
+class GenreViewSet(SlugNameViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
@@ -75,7 +56,6 @@ class TitleViewSet(viewsets.ModelViewSet):
 class ReviewViewSet(viewsets.ModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'delete']
     serializer_class = ReviewSerializer
-    pagination_class = PageNumberPagination
     permission_classes = (IsAuthorModerAdminOrSafeMethods,)
 
     def perform_create(self, serializer):
