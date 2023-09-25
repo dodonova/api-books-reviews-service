@@ -1,5 +1,5 @@
 from http.client import BAD_REQUEST, OK
-
+from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from django.db import IntegrityError
@@ -13,7 +13,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
 
 from users.models import User
-from users.permissions import IsAdmin
+from users.permissions import IsAdminOrSuperuser
 from users.serializers import TokenSerializer, UserCreateSerializer, UsersSerializer
 
 
@@ -22,6 +22,7 @@ class SignUpView(APIView):
     POST-запрос с email и username генерирует
     письмо с кодом для получения токена.
     '''
+
     permission_classes = (permissions.AllowAny,)
     serializer_class = UserCreateSerializer
     queryset = User.objects.all()
@@ -45,7 +46,7 @@ class SignUpView(APIView):
         send_mail(
             subject='Код подтверждения',
             message=f'Ваш код подтверждения: {confirmation_code}',
-            from_email='fromexample@mail.ru',
+            from_email=settings.AUTH_EMAIL,
             recipient_list=(user.email,),
             fail_silently=False,
         )
@@ -73,7 +74,7 @@ def token_jwt(request):
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UsersSerializer
-    permission_classes = [permissions.IsAuthenticated, IsAdmin]
+    permission_classes = [permissions.IsAuthenticated, IsAdminOrSuperuser]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     search_fields = ['username', ]
     lookup_field = 'username'
@@ -87,10 +88,6 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserCreateSerializer(request.user,
                                           data=request.data,
                                           partial=True)
-        if request.user.role == 'admin' or request.user.role == 'moderator':
-            serializer.is_valid(raise_exception=True)
-            serializer.save()
-            return Response(serializer.data, status=OK)
         serializer.is_valid(raise_exception=True)
-        serializer.save(role='user')
+        serializer.save(role = request.user.role)
         return Response(serializer.data, status=OK)

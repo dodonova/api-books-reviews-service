@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
+from .validators import validate_username_not_me
 from django.db import models
 
 
@@ -14,13 +15,11 @@ class User(AbstractUser):
     ]
     username = models.CharField(max_length=150,
                                 unique=True,
-                                blank=False,
                                 validators=([RegexValidator
                                              (regex=r'^[\w.@+-]+$')]))
     email = models.EmailField(max_length=254,
-                              blank=False,
                               unique=True)
-    bio = models.TextField(max_length=150, blank=True)
+    bio = models.TextField(blank=True)
     confirmation_code = models.CharField(
         'Код подтверждения',
         help_text='Код подтверждения пользователя',
@@ -29,14 +28,13 @@ class User(AbstractUser):
     role = models.CharField(
         'Роль',
         help_text='Роль пользователя',
-        max_length=150,
-        blank=False,
+        max_length=max([len(i[1]) for i in USER_ROLES]),
         choices=USER_ROLES,
-        default='user',
+        default=USER,
     )
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ('username', )
 
     class Meta:
         verbose_name = 'пользователь'
