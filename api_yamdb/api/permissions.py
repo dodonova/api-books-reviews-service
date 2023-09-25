@@ -1,14 +1,15 @@
 from rest_framework import permissions
 from users.permissions import IsAdminOrReadOnly
 
-ADMIN = 'admin'
-MODERATOR = 'moderator'
+from users.models import ADMIN, MODERATOR
 
 
 class IsAdmin(permissions.BasePermission):
 
     def has_permission(self, request, view):
-        return request.user.is_authenticated and (request.user.role == ADMIN)
+        return request.user.is_authenticated and (
+            request.user.role == ADMIN
+        )
 
 
 class IsAdminOrSafeMethods(IsAdmin):

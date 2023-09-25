@@ -8,7 +8,7 @@ router.register(r'users', UserViewSet)
 
 
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/auth/signup/', SignUpView.as_view(), name='signup'),
-    path('v1/auth/token/', token_jwt, name='token'),
+    path('api/v1/', include(router.urls)),
+    path('api/v1/auth/signup/', SignUpView.as_view(), name='signup'),
+    path('api/v1/auth/token/', token_jwt, name='token'),
 ]

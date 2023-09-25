@@ -3,11 +3,12 @@ from django.core.validators import RegexValidator
 from .validators import validate_username_not_me
 from django.db import models
 
+ADMIN = 'admin'
+MODERATOR = 'moderator'
+USER = 'user'
+
 
 class User(AbstractUser):
-    ADMIN = 'admin'
-    MODERATOR = 'moderator'
-    USER = 'user'
     USER_ROLES = [
         (USER, 'user'),
         (MODERATOR, 'moderator'),
