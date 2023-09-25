@@ -122,7 +122,7 @@ class TextAuthorPub_date(models.Model):
         abstract = True
 
     def __str__(self):
-        return self.name[:50]
+        return self.text[:50]
 
 
 class Review(TextAuthorPub_date):

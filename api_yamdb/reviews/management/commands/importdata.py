@@ -21,6 +21,17 @@ class Command(BaseCommand):
     from the custom CSV file to the custom database file.
     If you set --table you also must set --csv.
     """
+
+    CSV_MODELS = {
+        'category': 'reviews_category',
+        'genre': 'reviews_genre',
+        'title': 'reviews_title',
+        'review': 'reviews_review',
+        'title_genre': 'reviews_genretitle',
+        'comment': 'reviews_comment',
+        'user': 'users_user'
+    }
+
     help = ('Import data from csv file to sqlite3 database. '
             'By default import all files '
             'to db.sqlite3 from static/data/')
@@ -52,7 +63,8 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        """Import data from csv files to dsqlite3 database."""
+        """Import data from csv files to sqlite3 database."""
+
         if options['db'] is not None:
             db_name = options['db'][0]
         else:
@@ -65,17 +77,8 @@ class Command(BaseCommand):
             filename = options['csv'][0]
         else:
             filename = None
-        # TODO: почему нужно брать [0] при получении options?
         if filename is None and table_name is None:
-            model_names = {
-                'category': 'reviews_category',
-                'genre': 'reviews_genre',
-                'title': 'reviews_title',
-                'review': 'reviews_review',
-                'title_genre': 'reviews_title_genre',
-                'comment': 'reviews_comment',
-                'user': 'users_user'
-            }
+            model_names = self.CSV_MODELS
             for filename, table_name in model_names.items():
                 self.stdout.write(
                     f'Importing to {db_name}, {table_name} from {filename}'
@@ -95,6 +98,7 @@ class Command(BaseCommand):
 
         For importing to the table users_user calls method import_users().
         """
+
         if not os.path.isfile(csv_file):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), csv_file
@@ -132,6 +136,7 @@ class Command(BaseCommand):
 
         Method fills in missing fields when importing.
         """
+
         conn = sqlite3.connect(db)
         cursor = conn.cursor()
         with open(csv_file, 'r') as csvfile:

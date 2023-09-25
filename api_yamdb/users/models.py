@@ -26,7 +26,10 @@ class User(AbstractUser):
     )
     email = models.EmailField(max_length=254,
                               unique=True)
-    bio = models.TextField(blank=True)
+    bio = models.TextField(
+        blank=True,
+        verbose_name='Биография'
+    )
     confirmation_code = models.CharField(
         'Код подтверждения',
         help_text='Код подтверждения пользователя',

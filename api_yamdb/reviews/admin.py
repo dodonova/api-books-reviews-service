@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
 from reviews.models import (
     Category,
@@ -7,17 +6,6 @@ from reviews.models import (
     Genre,
     Review,
     Title,
-    User,
-)
-
-# Добавляем поле с биографией
-# к стандартному набору полей (fieldsets) пользователя в админке.
-UserAdmin.fieldsets += (
-    # Добавляем кортеж, где первый элемент —
-    # это название раздела в админке,
-    # а второй элемент — словарь,
-    # где под ключом fields можно указать нужные поля.
-    ('Extra Fields', {'fields': ('bio',)}),
 )
 
 
@@ -48,9 +36,23 @@ class TitleAdmin(admin.ModelAdmin):
     inlines = [GenreInline]
 
 
-admin.site.register(User, UserAdmin)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = [
+        'text',
+        'pub_date',
+    ]
+
+
+class ReviewAdmin(admin.ModelAdmin):
+    list_display = (
+        'text',
+        'pub_date',
+        'author'
+    )
+
+
 admin.site.register(Category, SlugNameAdmin)
 admin.site.register(Genre, SlugNameAdmin)
 admin.site.register(Title, TitleAdmin)
-admin.site.register(Review)
-admin.site.register(Comment)
+admin.site.register(Review, ReviewAdmin)
+admin.site.register(Comment, CommentAdmin)
