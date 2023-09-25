@@ -24,28 +24,33 @@ UserAdmin.fieldsets += (
 class SlugNameAdmin(admin.ModelAdmin):
     list_display = ['name', 'slug']
 
-# class GenreInline(admin.StackedInline):
-#     model = Genre
-#     extra = 0
+
+class GenreInline(admin.TabularInline):
+    model = Title.genre.through
 
 
 class TitleAdmin(admin.ModelAdmin):
-    # inlines = (GenreInline, )
+
+    def genres_list(self, obj):
+        return ", ".join([genre.name for genre in obj.genre.all()])
+
+    genres_list.short_description = "Жанры"
     list_display = [
         'name',
-        'category',
         'year',
+        'category',
+        'genres_list',
         'description',
     ]
     list_editable = ('category', )
-    list_filter = ('category', 'name')
+    list_filter = ('category', 'genre')
     filter_horizontal = ('genre',)
+    inlines = [GenreInline]
 
 
 admin.site.register(User, UserAdmin)
 admin.site.register(Category, SlugNameAdmin)
 admin.site.register(Genre, SlugNameAdmin)
 admin.site.register(Title, TitleAdmin)
-# TODO:  вывести список жанров через запятую в листе произведений 
 admin.site.register(Review)
 admin.site.register(Comment)

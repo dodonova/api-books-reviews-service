@@ -10,37 +10,23 @@ from reviews.models import (
 )
 
 
-# class SlugNameSerializer(serializers.ModelSerializer):
-
-#     class Meta:
-#         fields = ('slug', 'name')
-#         abstract = True
-
-# class CategorySerializer(SlugNameSerializer):
-    
-#     class Meta:
-#         model = Category
-
-
-# class GenreSerializer(SlugNameSerializer):
-    
-#     class Meta:
-#         model = Genre
-
-
-
-class CategorySerializer(serializers.ModelSerializer):
+class SlugNameSerializer(serializers.ModelSerializer):
 
     class Meta:
+        fields = ('slug', 'name')
+        abstract = True
+
+
+class CategorySerializer(SlugNameSerializer):
+
+    class Meta(SlugNameSerializer.Meta):
         model = Category
-        fields = ('slug', 'name')
 
 
-class GenreSerializer(serializers.ModelSerializer):
+class GenreSerializer(SlugNameSerializer):
 
-    class Meta:
+    class Meta(SlugNameSerializer.Meta):
         model = Genre
-        fields = ('slug', 'name')
 
 
 class TitleGETSerializer(serializers.ModelSerializer):

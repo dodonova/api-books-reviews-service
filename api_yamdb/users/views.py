@@ -14,7 +14,11 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 from users.models import User
 from users.permissions import IsAdminOrSuperuser
-from users.serializers import TokenSerializer, UserCreateSerializer, UsersSerializer
+from users.serializers import (
+    TokenSerializer,
+    UserCreateSerializer,
+    UsersSerializer
+)
 
 
 class SignUpView(APIView):
@@ -89,5 +93,5 @@ class UserViewSet(viewsets.ModelViewSet):
                                           data=request.data,
                                           partial=True)
         serializer.is_valid(raise_exception=True)
-        serializer.save(role = request.user.role)
+        serializer.save(role=request.user.role)
         return Response(serializer.data, status=OK)

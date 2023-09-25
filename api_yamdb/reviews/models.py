@@ -31,19 +31,16 @@ class SlugNameModel(models.Model):
 
 class Category(SlugNameModel):
 
-    class Meta:
+    class Meta(SlugNameModel.Meta):
         verbose_name = 'категория',
         verbose_name_plural = 'Категории'
-        ordering = ('name',)
-
 
 
 class Genre(SlugNameModel):
 
-    class Meta:
+    class Meta(SlugNameModel.Meta):
         verbose_name = 'жанр'
         verbose_name_plural = 'Жанры'
-        ordering = ('name', )
 
 
 class Title(models.Model):
