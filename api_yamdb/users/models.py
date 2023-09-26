@@ -1,7 +1,12 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
-from .validators import validate_username_not_me
 from django.db import models
+
+from users.validators import validate_username_not_me
+from api_yamdb.settings import (
+    USERNAME_MAX_LENTH,
+    EMAIL_MAX_LENGTH
+)
 
 ADMIN = 'admin'
 MODERATOR = 'moderator'
@@ -15,7 +20,7 @@ class User(AbstractUser):
         (ADMIN, 'admin'),
     ]
     username = models.CharField(
-        max_length=150,
+        max_length=USERNAME_MAX_LENTH,
         unique=True,
         validators=([
             RegexValidator(
@@ -24,7 +29,7 @@ class User(AbstractUser):
             validate_username_not_me
         ])
     )
-    email = models.EmailField(max_length=254,
+    email = models.EmailField(max_length=EMAIL_MAX_LENGTH,
                               unique=True)
     bio = models.TextField(
         blank=True,

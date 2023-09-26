@@ -5,7 +5,7 @@ from rest_framework import (
     viewsets
 )
 
-from api.permissions import IsAdminOrGetList
+from users.permissions import IsAdminOrReadOnly
 
 
 class SlugNameViewSet(
@@ -14,7 +14,7 @@ class SlugNameViewSet(
     mixins.DestroyModelMixin,
     viewsets.GenericViewSet
 ):
-    permission_classes = (IsAdminOrGetList, )
+    permission_classes = (IsAdminOrReadOnly, )
     pagination_class = LimitOffsetPagination
     lookup_field = 'slug'
     filter_backends = (filters.SearchFilter,)

@@ -136,3 +136,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails')
 
 AUTH_EMAIL = 'auth@api_yamdb.com'
+
+NAME_MAX_LENGTH = 256
+SLUG_MAX_LENGHT = 50
+USERNAME_MAX_LENTH = 150
+EMAIL_MAX_LENGTH = 254
+DISPLAY_TEXT_MAX_LENGTH = 50

@@ -1,5 +1,4 @@
 from rest_framework import permissions
-from users.permissions import IsAdminOrReadOnly
 
 from users.models import ADMIN, MODERATOR
 
@@ -29,13 +28,4 @@ class IsAuthorModerAdminOrSafeMethods(permissions.IsAuthenticatedOrReadOnly):
             or obj.author == request.user
             or (request.user.role == MODERATOR)
             or (request.user.role == ADMIN)
-        )
-
-
-class IsAdminOrGetList(IsAdminOrReadOnly):
-
-    def has_object_permission(self, request, view, obj):
-        return (
-            view.action == 'list'
-            or request.method == 'DELETE'
         )

@@ -8,25 +8,30 @@ from django.db import models
 from django.utils import timezone
 
 from users.models import User
+from api_yamdb.settings import (
+    NAME_MAX_LENGTH,
+    SLUG_MAX_LENGHT,
+    DISPLAY_TEXT_MAX_LENGTH,
+)
 
 
 class SlugNameModel(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=256,
+        max_length=NAME_MAX_LENGTH,
     )
     slug = models.SlugField(
         verbose_name='Слаг',
         unique=True,
-        max_length=50,
+        max_length=SLUG_MAX_LENGHT,
     )
 
     class Meta:
-        ordering = ['name']
+        ordering = ('name', )
         abstract = True
 
     def __str__(self):
-        return self.name
+        return self.name[:DISPLAY_TEXT_MAX_LENGTH]
 
 
 class Category(SlugNameModel):
@@ -46,7 +51,7 @@ class Genre(SlugNameModel):
 class Title(models.Model):
     name = models.CharField(
         verbose_name='Название',
-        max_length=256
+        max_length=NAME_MAX_LENGTH
     )
     year = models.PositiveSmallIntegerField(
         verbose_name='Год издания',
@@ -88,7 +93,7 @@ class Title(models.Model):
         verbose_name_plural = 'Произведения'
 
     def __str__(self):
-        return self.name[:30]
+        return self.name[:DISPLAY_TEXT_MAX_LENGTH]
 
 
 class GenreTitle(models.Model):
@@ -102,10 +107,10 @@ class GenreTitle(models.Model):
     )
 
     def __str__(self):
-        return f'{self.title}-{self.genre}'[:50]
+        return f'{self.title}-{self.genre}'[:DISPLAY_TEXT_MAX_LENGTH]
 
 
-class TextAuthorPub_date(models.Model):
+class TextAuthorPubDate(models.Model):
     text = models.TextField('текст')
     author = models.ForeignKey(
         User,
@@ -118,14 +123,14 @@ class TextAuthorPub_date(models.Model):
     )
 
     class Meta:
-        ordering = ['pub_date']
+        ordering = ('pub_date', )
         abstract = True
 
     def __str__(self):
-        return self.text[:50]
+        return self.text[:DISPLAY_TEXT_MAX_LENGTH]
 
 
-class Review(TextAuthorPub_date):
+class Review(TextAuthorPubDate):
     title = models.ForeignKey(
         Title,
         on_delete=models.CASCADE,
@@ -139,7 +144,7 @@ class Review(TextAuthorPub_date):
         ]
     )
 
-    class Meta(TextAuthorPub_date.Meta):
+    class Meta(TextAuthorPubDate.Meta):
         constraints = [
             models.UniqueConstraint(
                 fields=['title', 'author'],
@@ -152,14 +157,14 @@ class Review(TextAuthorPub_date):
         default_related_name = 'reviews'
 
 
-class Comment(TextAuthorPub_date):
+class Comment(TextAuthorPubDate):
     review = models.ForeignKey(
         Review,
         on_delete=models.CASCADE,
         verbose_name='отзыв'
     )
 
-    class Meta(TextAuthorPub_date.Meta):
+    class Meta(TextAuthorPubDate.Meta):
         ordering = ('pub_date',)
         verbose_name = 'комментарий',
         verbose_name_plural = 'Комментарии'

@@ -10,7 +10,7 @@ from reviews.models import (
 
 
 class SlugNameAdmin(admin.ModelAdmin):
-    list_display = ['name', 'slug']
+    list_display = ('name', 'slug')
 
 
 class GenreInline(admin.TabularInline):
@@ -18,29 +18,28 @@ class GenreInline(admin.TabularInline):
 
 
 class TitleAdmin(admin.ModelAdmin):
-
-    def genres_list(self, obj):
-        return ", ".join([genre.name for genre in obj.genre.all()])
-
-    genres_list.short_description = "Жанры"
-    list_display = [
+    list_display = (
         'name',
         'year',
         'category',
         'genres_list',
         'description',
-    ]
+    )
     list_editable = ('category', )
     list_filter = ('category', 'genre')
     filter_horizontal = ('genre',)
-    inlines = [GenreInline]
+    inlines = (GenreInline, )
+
+    def genres_list(self, obj):
+        return ", ".join([genre.name for genre in obj.genre.all()])
+    genres_list.short_description = "Жанры"
 
 
 class CommentAdmin(admin.ModelAdmin):
-    list_display = [
+    list_display = (
         'text',
         'pub_date',
-    ]
+    )
 
 
 class ReviewAdmin(admin.ModelAdmin):
