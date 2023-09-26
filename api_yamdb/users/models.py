@@ -8,12 +8,11 @@ from api_yamdb.settings import (
     EMAIL_MAX_LENGTH
 )
 
-ADMIN = 'admin'
-MODERATOR = 'moderator'
-USER = 'user'
-
 
 class User(AbstractUser):
+    ADMIN = 'admin'
+    MODERATOR = 'moderator'
+    USER = 'user'
     USER_ROLES = [
         (USER, 'user'),
         (MODERATOR, 'moderator'),
