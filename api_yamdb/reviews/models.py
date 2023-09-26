@@ -1,18 +1,15 @@
-from datetime import datetime
-
-from django.core.validators import (
-    MaxValueValidator,
-    MinValueValidator,
-)
 from django.db import models
-from django.utils import timezone
 
-from users.models import User
 from api_yamdb.settings import (
     NAME_MAX_LENGTH,
     SLUG_MAX_LENGHT,
     DISPLAY_TEXT_MAX_LENGTH,
 )
+from reviews.validators import (
+    validate_score,
+    validate_year_number,
+)
+from users.models import User
 
 
 class SlugNameModel(models.Model):
@@ -56,7 +53,7 @@ class Title(models.Model):
     year = models.PositiveSmallIntegerField(
         verbose_name='Год издания',
         validators=[
-            MaxValueValidator(datetime.now().year)
+            validate_year_number
         ]
     )
     description = models.TextField(
@@ -78,16 +75,6 @@ class Title(models.Model):
     )
 
     class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(year__lte=timezone.now().year,),
-                name='year_lte_this_year'
-            ),
-            models.CheckConstraint(
-                check=models.Q(year__gte=0,),
-                name='year_gte_min_year'
-            ),
-        ]
         ordering = ('name',)
         verbose_name = 'произведение',
         verbose_name_plural = 'Произведения'
@@ -139,8 +126,7 @@ class Review(TextAuthorPubDate):
     score = models.PositiveSmallIntegerField(
         'рейтинг произведения',
         validators=[
-            MinValueValidator(1, '< 1'),
-            MaxValueValidator(10, '> 10')
+            validate_score
         ]
     )
 

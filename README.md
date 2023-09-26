@@ -25,7 +25,7 @@ pip install -r requirements.txt
 ``` 
 - Перейти в папку со скриптом управления и выполнить миграции
 ```
-cd yatube_api
+cd api_yamdb
 ```
 ```
 python manage.py migrate
