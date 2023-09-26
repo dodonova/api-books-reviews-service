@@ -2,9 +2,13 @@ import csv
 import datetime
 import errno
 import os
-import subprocess
 import sqlite3
+from pathlib import Path
 
+from api_yamdb.settings import (
+    DATABASES,
+    STATICFILES_DIRS
+)
 from django.core.management.base import BaseCommand
 
 
@@ -12,14 +16,9 @@ class Command(BaseCommand):
     """
     Provides importing data from csv files to sqlite database.
 
-    By default should start commant "importdata" from the folder
-    containing  file manage.py.
-    Commant imortdata takes csv files from folder static/data/
-    and import data to the relevant tables ib database dd.sqlite3.
+    Command imortdata takes csv files from folder static/data/
+    and import data to the relevant tables ib database db.sqlite3.
 
-    Options --db --table --csv allow to import every table separatly
-    from the custom CSV file to the custom database file.
-    If you set --table you also must set --csv.
     """
 
     CSV_MODELS = {
@@ -32,73 +31,51 @@ class Command(BaseCommand):
         'user': 'users_user'
     }
 
-    help = ('Import data from csv file to sqlite3 database. '
-            'By default import all files '
-            'to db.sqlite3 from static/data/')
+    DEFAULT_DB = Path(DATABASES["default"]["NAME"])
+    CSV_FOLDER = Path(STATICFILES_DIRS[0] / "data")
 
-    def add_arguments(self, parser):
-        parser.add_argument(
-            '--db',
-            nargs=1,
-            type=str,
-            required=False,
-            default=None,
-            help='Database file for import. Dy default import to "db.sqlite3"'
-        )
-        parser.add_argument(
-            '--table',
-            nargs=1,
-            type=str,
-            required=False,
-            default=None,
-            help='Table name ib database.'
-        )
-        parser.add_argument(
-            '--csv',
-            nargs=1,
-            type=str,
-            required=False,
-            default=None,
-            help='CSV file name with data for import.'
-        )
+    help = (
+        f'Import data from csv file to sqlite3 database. '
+        f'Import csv files to {DEFAULT_DB} from {CSV_FOLDER}'
+    )
 
     def handle(self, *args, **options):
         """Import data from csv files to sqlite3 database."""
 
-        if options['db'] is not None:
-            db_name = options['db'][0]
-        else:
-            db_name = 'db.sqlite3'
-        if options['table'] is not None:
-            table_name = options['table'][0]
-        else:
-            table_name = None
-        if options['csv'] is not None:
-            filename = options['csv'][0]
-        else:
-            filename = None
-        if filename is None and table_name is None:
-            model_names = self.CSV_MODELS
-            for filename, table_name in model_names.items():
+        db_name = self.DEFAULT_DB
+
+        model_names = self.CSV_MODELS
+        for filename, table_name in model_names.items():
+            full_filename = f'{self.CSV_FOLDER}/{filename}.csv'
+            self.stdout.write(
+                f'Importing to {db_name}, {table_name} from {full_filename}'
+            )
+            try:
+                self.check_db_csv(db_name, full_filename)
+                import_method = getattr(self, f'import_{filename}')
+                conn = sqlite3.connect(db_name)
+                cursor = conn.cursor()
+                import_method(cursor, full_filename, self.CSV_MODELS[filename])
+            except Exception as err:
+                err_msg = (
+                    f'Error import from {full_filename} to the table '
+                    f'{table_name}.\n{err}'
+                )
                 self.stdout.write(
-                    f'Importing to {db_name}, {table_name} from {filename}'
+                    self.style.ERROR(err_msg)
                 )
-                self.import_table(
-                    db_name, table_name, f'static/data/{filename}.csv'
+            else:
+                conn.commit()
+                conn.close()
+                success_msg = (
+                    f'Data imported from {full_filename} '
+                    f'to the table {table_name}.'
                 )
-        elif filename is None:
-            self.stdout.write(self.style.ERROR('CSV filename requiered.'))
-        elif table_name is None:
-            self.stdout.write(self.style.ERROR('Table name requiered.'))
-        else:
-            self.import_table(db_name, table_name, filename)
+                self.stdout.write(
+                    self.style.SUCCESS(success_msg)
+                )
 
-    def import_table(self, db, table, csv_file):
-        """Import any table using subprocess except of users_user.
-
-        For importing to the table users_user calls method import_users().
-        """
-
+    def check_db_csv(self, db, csv_file):
         if not os.path.isfile(csv_file):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), csv_file
@@ -107,46 +84,112 @@ class Command(BaseCommand):
             raise FileNotFoundError(
                 errno.ENOENT, os.strerror(errno.ENOENT), db
             )
-        if table == 'users_user':
-            self.import_users(db, csv_file)
-        else:
-            result = subprocess.run(
-                [
-                    'sqlite3',
-                    str(db),
-                    '-cmd',
-                    '.mode csv',
-                    f'.import --skip 1 {csv_file} {table}'
-                ],
-                capture_output=True
-            )
-            if len(result.stdout) > 1:
-                self.stdout.write(self.style.SUCCESS(f'{result.stdout}'))
-            if len(result.stderr) > 1:
-                self.stdout.write(self.style.ERROR(f'{result.stderr}'))
+        return True
 
-        self.stdout.write(
-            self.style.SUCCESS(
-                f'Data imported from {csv_file} to the table {table}.'
-            )
-        )
-
-    def import_users(self, db, csv_file):
-        """Import data from user.csv to the table users_user.
-
-        Method fills in missing fields when importing.
-        """
-
-        conn = sqlite3.connect(db)
-        cursor = conn.cursor()
+    def import_category(self, cursor, csv_file, table):
         with open(csv_file, 'r') as csvfile:
             reader = csv.DictReader(csvfile)
             query = (
-                'INSERT INTO users_user '
-                '(id, username, email, role, bio, first_name, last_name, '
-                'password, is_superuser, is_staff, is_active, '
-                'date_joined, confirmation_code) '
-                'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
+                f'INSERT INTO {table} '
+                f'(id, slug, name) '
+                f'VALUES (?, ?, ?)'
+            )
+            for row in reader:
+                cursor.execute(
+                    query, (
+                        row['id'],
+                        row['slug'],
+                        row['name'],
+                    )
+                )
+
+    def import_genre(self, cursor, csv_file, table):
+        self.import_category(cursor, csv_file, table)
+
+    def import_title(self, cursor, csv_file, table):
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            query = (
+                f'INSERT INTO {table} '
+                f'(id, name, year, description, category_id) '
+                f'VALUES (?, ?, ?, ?, ?)'
+            )
+            for row in reader:
+                cursor.execute(
+                    query, (
+                        row['id'],
+                        row['name'],
+                        row['year'],
+                        "Нет описания",
+                        row['category'],
+                    )
+                )
+
+    def import_title_genre(self, cursor, csv_file, table):
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            query = (
+                f'INSERT INTO {table} '
+                f'(id, genre_id, title_id) '
+                f'VALUES (?, ?, ?)'
+            )
+            for row in reader:
+                cursor.execute(
+                    query, (
+                        row['id'],
+                        row['genre_id'],
+                        row['title_id'],
+                    )
+                )
+
+    def import_review(self, cursor, csv_file, table):
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            query = (
+                f'INSERT INTO {table} '
+                f'(id, text, score, pub_date, author_id, title_id) '
+                f'VALUES (?, ?, ?, ?, ?, ?)'
+            )
+            for row in reader:
+                cursor.execute(
+                    query, (
+                        row['id'],
+                        row['text'],
+                        row['score'],
+                        row['pub_date'],
+                        row['author'],
+                        row['title_id']
+                    )
+                )
+
+    def import_comment(self, cursor, csv_file, table):
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            query = (
+                f'INSERT INTO {table} '
+                f'(id, text, pub_date, author_id, review_id) '
+                f'VALUES (?, ?, ?, ?, ?)'
+            )
+            for row in reader:
+                cursor.execute(
+                    query, (
+                        row['id'],
+                        row['text'],
+                        row['pub_date'],
+                        row['author'],
+                        row['review_id']
+                    )
+                )
+
+    def import_user(self, cursor, csv_file, table):
+        with open(csv_file, 'r') as csvfile:
+            reader = csv.DictReader(csvfile)
+            query = (
+                f'INSERT INTO {table} '
+                f'(id, username, email, role, bio, first_name, last_name, '
+                f'password, is_superuser, is_staff, is_active, '
+                f'date_joined, confirmation_code) '
+                f'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'
             )
             for row in reader:
                 cursor.execute(
@@ -162,5 +205,3 @@ class Command(BaseCommand):
                         datetime.datetime.now(), ""
                     )
                 )
-        conn.commit()
-        conn.close()
