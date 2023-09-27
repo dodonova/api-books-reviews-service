@@ -78,14 +78,14 @@ Password (again): <ваш_пароль>
 
 ```
 http://127.0.0.1:8000/redoc/
-```
+
 ### Techonologies: 
 
 REST API, Viewsets, routers, JWT, serializers, permissions, limits, pagination, sorting, CSV, Django.
 
 ## Над проектом работали
-[Екатерина Додонова](https://github.com/dodonova)
-[Алексей Котко](https://github.com/Zaphod999)
-[Антон Ильичев](https://github.com/Antochino)
+<br>[Екатерина Додонова](https://github.com/dodonova)</br>
+<br>[Алексей Котко](https://github.com/Zaphod999)</br>
+<br>[Антон Ильичев](https://github.com/Antochino)</br>
 
 
