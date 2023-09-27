@@ -98,8 +98,8 @@ CSV файлы должны быть размещены в папке  проп�
 REST API, Viewsets, routers, JWT, serializers, permissions, limits, pagination, sorting, CSV, Django.
 
 ## Над проектом работали
-<br>[Екатерина Додонова](https://github.com/dodonova)</br>
-<br>[Алексей Котко](https://github.com/Zaphod999)</br>
-<br>[Антон Ильичев](https://github.com/Antochino)</br>
+* [Екатерина Додонова](https://github.com/dodonova)</br>
+* [Алексей Котко](https://github.com/Zaphod999)</br>
+* [Антон Ильичев](https://github.com/Antochino)</br>
 
 
