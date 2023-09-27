@@ -4,13 +4,14 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
 from api.filters import TitleGenreFilter
-from api.permissions import (
-    IsAdminOrSafeMethods,
-    IsAuthorModerAdminOrSafeMethods
-)
+from api.mixins import SlugNameViewSet
 from api.serializers import (
+    CategorySerializer,
     CommentSerializer,
+    GenreSerializer,
     ReviewSerializer,
+    TitleGETSerializer,
+    TitleSerializer,
 )
 from reviews.models import (
     Category,
@@ -18,13 +19,10 @@ from reviews.models import (
     Title,
     Review,
 )
-from api.serializers import (
-    CategorySerializer,
-    GenreSerializer,
-    TitleGETSerializer,
-    TitleSerializer,
+from users.permissions import (
+    IsAdminOrReadOnly,
+    IsAuthorModerAdminOrSafeMethods
 )
-from api.mixins import SlugNameViewSet
 
 
 class CategoryViewSet(SlugNameViewSet):
@@ -44,7 +42,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     ).order_by('name')
     filter_backends = (DjangoFilterBackend, )
     filterset_class = TitleGenreFilter
-    permission_classes = (IsAdminOrSafeMethods,)
+    permission_classes = (IsAdminOrReadOnly,)
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH'):

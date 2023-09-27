@@ -4,8 +4,8 @@ from django.db import models
 
 from users.validators import validate_username_not_me
 from api_yamdb.settings import (
+    EMAIL_MAX_LENGTH,
     USERNAME_MAX_LENTH,
-    EMAIL_MAX_LENGTH
 )
 
 
@@ -58,3 +58,18 @@ class User(AbstractUser):
     def __str__(self):
         """ Строковое представление модели (отображается в консоли) """
         return self.username
+
+    @property
+    def is_admin(self):
+        return (
+            self.role == User.ADMIN
+            or self.is_staff
+            or self.is_superuser
+        )
+
+    @property
+    def is_moderator(self):
+        return (
+            self.role == User.MODERATOR
+            or self.is_admin
+        )
