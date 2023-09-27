@@ -56,7 +56,7 @@ Password (again): <ваш_пароль>
 
 ## Примеры запросов
 
-- Отправить POST-запрос на адрес http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/ и передать поле text <br>
+- Отправить POST-запрос на адрес ```http://127.0.0.1:8000/api/v1/titles/{title_id}/reviews/{review_id}/comments/``` и передать поле ```text``` <br>
 Пример запроса на создание комментария к отзыву:
 ```
 {
