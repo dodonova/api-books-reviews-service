@@ -14,9 +14,9 @@ class User(AbstractUser):
     MODERATOR = 'moderator'
     USER = 'user'
     USER_ROLES = [
-        (USER, 'user'),
-        (MODERATOR, 'moderator'),
-        (ADMIN, 'admin'),
+        (USER, 'пользователь'),
+        (MODERATOR, 'модератор'),
+        (ADMIN, 'администратор'),
     ]
     username = models.CharField(
         max_length=USERNAME_MAX_LENTH,
