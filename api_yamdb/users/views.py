@@ -1,4 +1,5 @@
 from http.client import BAD_REQUEST, OK
+
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
@@ -11,14 +12,10 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import AccessToken
-
 from users.models import User
 from users.permissions import IsAdmin
-from users.serializers import (
-    TokenSerializer,
-    UserCreateSerializer,
-    UsersSerializer
-)
+from users.serializers import (TokenSerializer, UserCreateSerializer,
+                               UsersSerializer)
 
 
 class SignUpView(APIView):

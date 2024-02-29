@@ -1,15 +1,9 @@
 from django.db import models
-
-from api_yamdb.settings import (
-    NAME_MAX_LENGTH,
-    SLUG_MAX_LENGHT,
-    DISPLAY_TEXT_MAX_LENGTH,
-)
-from reviews.validators import (
-    validate_score,
-    validate_year_number,
-)
+from reviews.validators import validate_score, validate_year_number
 from users.models import User
+
+from api_yamdb.settings import (DISPLAY_TEXT_MAX_LENGTH, NAME_MAX_LENGTH,
+                                SLUG_MAX_LENGHT)
 
 
 class SlugNameModel(models.Model):

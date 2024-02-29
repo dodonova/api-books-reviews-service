@@ -1,12 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
 from django.db import models
-
 from users.validators import validate_username_not_me
-from api_yamdb.settings import (
-    EMAIL_MAX_LENGTH,
-    USERNAME_MAX_LENTH,
-)
+
+from api_yamdb.settings import EMAIL_MAX_LENGTH, USERNAME_MAX_LENTH
 
 
 class User(AbstractUser):

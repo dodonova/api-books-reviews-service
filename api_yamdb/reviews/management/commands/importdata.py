@@ -5,11 +5,9 @@ import os
 import sqlite3
 from pathlib import Path
 
-from api_yamdb.settings import (
-    DATABASES,
-    STATICFILES_DIRS
-)
 from django.core.management.base import BaseCommand
+
+from api_yamdb.settings import DATABASES, STATICFILES_DIRS
 
 
 class Command(BaseCommand):
